@@ -1,0 +1,70 @@
+import java.net.*;
+import java.io.*;
+public class serverselective1 {
+public static void main(String[] args) throws IOException {
+ServerSocket ss = new ServerSocket(3333);
+Socket s = ss.accept();
+DataInputStream din = new DataInputStream(s.getInputStream());
+DataOutputStream dout = new DataOutputStream(s.getOutputStream());
+int[] arr = { 10, 20, 30, 40, 50, 60, 70 };
+int k = arr.length;
+dout.write(k);
+for (int i = 0; i < arr.length; i++) {
+System.out.println("sending frame:" + arr[i]);
+dout.write(arr[i]);
+}
+int rd = din.read();
+System.out.println("ERROR frame recieved aft ack" + (rd + 1));
+dout.write(arr[rd]);
+din.close();
+s.close();
+ss.close();
+}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+import java.util.*;
+import java.net.*;
+import java.io.*;
+
+public class clientselective1 {
+public static void main(String[] args) throws IOException {
+Socket s = new Socket("localhost", 3333);
+DataInputStream din = new DataInputStream(s.getInputStream());
+DataOutputStream dout = new DataOutputStream(s.getOutputStream());
+int y = din.read();
+System.out.println();
+int[] arr = new int[y];
+for (int i = 0; i < y; i++) {
+arr[i] = din.read();
+System.out.println("recieving frame: " + arr[i]);
+}
+arr[4] = -1;
+int temp = 0;
+for (int i = 0; i < y; i++) {
+if (arr[i] == -1) {
+temp = i;
+System.out.println("eror in frame: " + arr[i]);
+} else {
+System.out.println("reciving frame:" + arr[i]);
+}
+}
+dout.write(temp);
+arr[temp] = din.read();
+System.out.println("resent frame:" + temp);
+System.out.println("final frame");
+System.out.println(arr[temp]);
+din.close();
+s.close();
+}
+}
